@@ -1,7 +1,6 @@
 const { expect } = require("chai");
 const AppFactory = require("../App");
 const HttpClient = require("../../HttpClient/HttpClient")();
-const ServiceFactory = require("../../Service/Service");
 
 describe("App Factory", () => {
   it("should return a TasksJS App", () => {
@@ -9,21 +8,10 @@ describe("App Factory", () => {
 
     expect(App)
       .to.be.an("object")
-      .that.has.all.keys(
-        "module",
-        "ServerModule",
-        "on",
-        "emit",
-        "startService",
-        "loadService",
-        "onLoad",
-        "config"
-      )
+      .that.has.all.keys("module", "on", "emit", "loadService", "onLoad", "config")
       .that.respondsTo("module")
-      .that.respondsTo("ServerModule")
       .that.respondsTo("on")
       .that.respondsTo("emit")
-      .that.respondsTo("startService")
       .that.respondsTo("loadService")
       .that.respondsTo("onLoad")
       .that.respondsTo("config");
@@ -31,17 +19,8 @@ describe("App Factory", () => {
 });
 describe("App: Loading Services", () => {
   it("should be able to use App.loadService to load as hosted Service", async () => {
-    const Service = ServiceFactory();
     const route = "test-service";
     const port = "8499";
-
-    Service.ServerModule("mod", function() {
-      this.test = () => {};
-      this.test2 = () => {};
-    });
-
-    await Service.startService({ route, port });
-
     await new Promise(resolve => {
       const App = AppFactory();
       App.loadService("test", { route, port }).on("init_complete", system => {
@@ -59,16 +38,8 @@ describe("App: Loading Services", () => {
   });
 
   it("should be able to use App.loadService(...).onLoad(handler) to fire a callback when the Service connects", async () => {
-    const Service = ServiceFactory();
     const route = "test-service";
     const port = "8422";
-
-    Service.ServerModule("mod", function() {
-      this.test = () => {};
-      this.test2 = () => {};
-    });
-
-    await Service.startService({ route, port });
 
     await new Promise(resolve => {
       const App = AppFactory();
@@ -85,16 +56,8 @@ describe("App: Loading Services", () => {
   });
 
   it('should use App.on("service_loaded[:name]", callback) to fire when a Service has loaded', async () => {
-    const Service = ServiceFactory();
     const route = "test-service";
     const port = "8423";
-
-    Service.ServerModule("mod", function() {
-      this.test = () => {};
-      this.test2 = () => {};
-    });
-
-    await Service.startService({ route, port });
 
     await new Promise(resolve => {
       const App = AppFactory();
@@ -120,16 +83,8 @@ describe("App: Loading Services", () => {
   });
 
   it("should be accessible to SystemObjects via the module.useService method", async () => {
-    const Service = ServiceFactory();
     const route = "test-service";
     const port = "8442";
-
-    Service.ServerModule("mod", function() {
-      this.test = () => {};
-      this.test2 = () => {};
-    });
-
-    await Service.startService({ route, port });
 
     await new Promise(resolve => {
       const App = AppFactory();
@@ -149,7 +104,7 @@ describe("App: Loading Services", () => {
   });
 });
 
-describe("App SystemObjects: Initializing Modules,  ServerModules and configurations", () => {
+describe("App SystemObjects: Initializing Modules and configurations", () => {
   it("should be able to use App.module to initialize a module", async () => {
     const App = AppFactory();
     return new Promise(resolve =>
@@ -175,77 +130,11 @@ describe("App SystemObjects: Initializing Modules,  ServerModules and configurat
       })
     );
   });
-  it("should be able to use App.startService to start as Service", async () => {
-    const App = AppFactory();
-    const route = "test-service";
-    const port = "8493";
-    const url = `http://localhost:${port}/${route}`;
-    App.startService({ route, port });
-
-    const connData = await HttpClient.request({ url });
-
-    expect(connData)
-      .to.be.an("Object")
-      .that.has.all.keys(
-        "TasksJSService",
-        "host",
-        "port",
-        "modules",
-        "route",
-        "namespace",
-        "serviceUrl"
-      )
-      .that.has.property("modules")
-      .that.is.an("array").that.is.empty;
-    expect(connData.serviceUrl).to.equal(url);
-  });
-  it("should be able to use App.ServerModule to add a hosted ServerModule to the Service", async () => {
-    const App = AppFactory();
-    const route = "test-service";
-    const port = "8494";
-    const url = `http://localhost:${port}/${route}`;
-
-    App.startService({ route, port })
-      .ServerModule("mod", function() {
-        this.test = () => {};
-        this.test2 = () => {};
-      })
-      .ServerModule("mod2", function() {
-        this.test = () => {};
-        this.test2 = () => {};
-      });
-
-    const connData = await HttpClient.request({ url });
-
-    expect(connData)
-      .to.be.an("Object")
-      .that.has.all.keys(
-        "TasksJSService",
-        "host",
-        "port",
-        "modules",
-        "route",
-        "namespace",
-        "serviceUrl"
-      )
-      .that.has.property("modules")
-      .that.is.an("array");
-    expect(connData.modules).to.have.a.lengthOf(2);
-    expect(connData.modules[0])
-      .to.be.an("Object")
-      .that.has.all.keys("namespace", "route", "name", "methods")
-      .that.has.property("methods")
-      .that.is.an("array");
-    expect(connData.modules[0].methods, [
-      { method: "PUT", name: "test" },
-      { method: "PUT", name: "test2" }
-    ]);
-  });
 
   it('should be able to use App.on("init_complete", callback) fire a callback when App initialization is complete', async () => {
     const App = AppFactory();
 
-    App.ServerModule("mod", function() {
+    App.module("mod", function() {
       this.test = () => {};
       this.test2 = () => {};
     }).module("mod", function() {
@@ -257,14 +146,7 @@ describe("App SystemObjects: Initializing Modules,  ServerModules and configurat
       App.on("init_complete", system => {
         expect(system)
           .to.be.an("object")
-          .that.has.all.keys(
-            "Services",
-            "Service",
-            "Modules",
-            "ServerModules",
-            "configurations",
-            "App"
-          );
+          .that.has.all.keys("Services", "Modules", "configurations", "App");
         resolve();
       })
     );
@@ -273,7 +155,7 @@ describe("App SystemObjects: Initializing Modules,  ServerModules and configurat
   it("should be able to use App.config(constructor) to construct a configuartion module", async () => {
     const App = AppFactory();
 
-    App.ServerModule("mod", function() {
+    App.module("mod", function() {
       this.test = () => {};
       this.test2 = () => {};
     })
@@ -303,7 +185,7 @@ describe("App SystemObjects: Initializing Modules,  ServerModules and configurat
 });
 
 describe("SystemObjects", () => {
-  it("should be able to use this.useModule and this.useService within modules and ServerModule", () => {
+  it("should be able to use this.useModule and this.useService within modules", () => {
     const App = AppFactory();
     App.module("mod1", function() {
       expect(this)

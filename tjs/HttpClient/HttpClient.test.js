@@ -2,10 +2,7 @@ const { expect } = require("chai");
 const fs = require("fs");
 const HttpClientFactory = require("./HttpClient");
 const port = 4789;
-const testServerSetup = require("./test.server");
-//test server setup
 
-beforeAll(() => new Promise(resolve => testServerSetup(port, resolve)));
 describe("HttpClientFactory Test", () => {
   const HttpClient = HttpClientFactory();
   const url = `http://localhost:${port}/test`;

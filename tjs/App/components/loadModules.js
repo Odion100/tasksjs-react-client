@@ -6,8 +6,5 @@ module.exports = function loadModules(system) {
     mod.__constructor.apply(mod.module);
   });
 
-  system.ServerModules.forEach(({ name, __constructor }) =>
-    system.Service.ServerModule(name, __constructor)
-  );
   system.App.emit("init_complete", system);
 };

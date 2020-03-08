@@ -1,12 +1,8 @@
 const { expect } = require("chai");
 const SocketDispatcher = require("../components/SocketDispatcher");
-const { WebSocket, SocketServer } = require("../../ServerManager/components/WebSocketServer")();
 
 const namespace = "test-namespace";
 const port = 4592;
-const socket = WebSocket.of(`/${namespace}`);
-
-SocketServer.listen(port);
 
 describe("SocketDispatcher", () => {
   const eventName = "test-event";

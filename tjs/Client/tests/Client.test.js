@@ -1,7 +1,5 @@
 const { expect } = require("chai");
 const ClientFactory = require("../Client");
-const ServiceFactory = require("../../Service/Service");
-const Service = ServiceFactory();
 const port = 6757;
 const route = "service-test";
 const url = `http://localhost:${port}/${route}`;
@@ -17,21 +15,6 @@ describe("Client Factory", () => {
 });
 describe("Client", () => {
   it("should be able to use Client.loadService(url, options) to return a promise that resolve into a backend service", async () => {
-    Service.ServerModule(
-      "orders",
-      function() {
-        this.action1 = (data, cb) =>
-          cb(null, { SERVICE_TEST_PASSED: true, ...data, action1: true });
-        this.action2 = (data, cb) =>
-          cb(null, { SERVICE_TEST_PASSED: true, ...data, action2: true });
-        this.action3 = (data, cb) =>
-          cb(null, { SERVICE_TEST_PASSED: true, ...data, action3: true });
-      },
-      ["action3"]
-    );
-
-    await Service.startService({ route, port });
-
     const Client = ClientFactory();
     const buAPI = await Client.loadService(url);
 
