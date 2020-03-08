@@ -20,7 +20,7 @@ describe("Client", () => {
 
     expect(buAPI)
       .to.be.an("object")
-      .that.has.all.keys("emit", "on", "resetConnection", "orders")
+      .that.has.all.keys("emit", "on", "resetConnection", "orders", "eventTester")
       .that.respondsTo("emit")
       .that.respondsTo("on")
       .that.respondsTo("resetConnection");
@@ -61,11 +61,6 @@ describe("Service", () => {
 
   it("should be able to receive events emitted from the backend Client", async () => {
     const eventName = "testing";
-    const eventTester = Service.ServerModule("eventTester", function() {
-      const eventTester = this;
-      eventTester.sendEvent = (data, cb) => eventTester.emit(eventName, { testPassed: true });
-    });
-
     const Client = ClientFactory();
     const buAPI = await Client.loadService(url);
 
@@ -76,9 +71,7 @@ describe("Service", () => {
         resolve();
       });
 
-      buAPI.on("connect", () => console.log("this should be called twice"));
-      buAPI.resetConnection();
-      setTimeout(() => eventTester.emit(eventName, { testPassed: true }), 500);
+      setTimeout(() => buAPI.eventTester.sendEvent(), 500);
     });
   });
 });

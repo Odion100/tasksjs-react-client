@@ -1,8 +1,5 @@
 //These are all the abstractions that make up TasksJS
 const AppFactory = require("./tjs/App/App");
-const LoadBalancerFactory = require("./tjs/LoadBalancer/LoadBalancer");
-const ServiceFactory = require("./tjs/Service/Service");
-const ServerManagerFactory = require("./tjs/ServerManager/ServerManager");
 const ClientFactory = require("./tjs/Client/Client");
 const HttpClientFactory = require("./tjs/HttpClient/HttpClient");
 
