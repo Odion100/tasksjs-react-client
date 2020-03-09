@@ -1,7 +1,5 @@
 const { expect } = require("chai");
 const ClientFactory = require("../Client");
-const ServiceFactory = require("../../Service/Service");
-const Service = ServiceFactory();
 const port = 6757;
 const route = "service-test";
 const url = `http://localhost:${port}/${route}`;
@@ -17,27 +15,12 @@ describe("Client Factory", () => {
 });
 describe("Client", () => {
   it("should be able to use Client.loadService(url, options) to return a promise that resolve into a backend service", async () => {
-    Service.ServerModule(
-      "orders",
-      function() {
-        this.action1 = (data, cb) =>
-          cb(null, { SERVICE_TEST_PASSED: true, ...data, action1: true });
-        this.action2 = (data, cb) =>
-          cb(null, { SERVICE_TEST_PASSED: true, ...data, action2: true });
-        this.action3 = (data, cb) =>
-          cb(null, { SERVICE_TEST_PASSED: true, ...data, action3: true });
-      },
-      ["action3"]
-    );
-
-    await Service.startService({ route, port });
-
     const Client = ClientFactory();
     const buAPI = await Client.loadService(url);
 
     expect(buAPI)
       .to.be.an("object")
-      .that.has.all.keys("emit", "on", "resetConnection", "orders")
+      .that.has.all.keys("emit", "on", "resetConnection", "orders", "eventTester")
       .that.respondsTo("emit")
       .that.respondsTo("on")
       .that.respondsTo("resetConnection");
@@ -78,11 +61,6 @@ describe("Service", () => {
 
   it("should be able to receive events emitted from the backend Client", async () => {
     const eventName = "testing";
-    const eventTester = Service.ServerModule("eventTester", function() {
-      const eventTester = this;
-      eventTester.sendEvent = (data, cb) => eventTester.emit(eventName, { testPassed: true });
-    });
-
     const Client = ClientFactory();
     const buAPI = await Client.loadService(url);
 
@@ -93,9 +71,7 @@ describe("Service", () => {
         resolve();
       });
 
-      buAPI.on("connect", () => console.log("this should be called twice"));
-      buAPI.resetConnection();
-      setTimeout(() => eventTester.emit(eventName, { testPassed: true }), 500);
+      setTimeout(() => buAPI.eventTester.sendEvent(), 500);
     });
   });
 });

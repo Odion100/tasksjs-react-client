@@ -1,31 +1,17 @@
 "use strict";
-const ServiceFactory = require("../Service/Service");
 const SystemObject = require("./components/SystemObject");
 const Dispatcher = require("../Dispatcher/Dispatcher");
 const initializeApp = require("./components/initializeApp");
 module.exports = function TasksJSApp() {
   const App = Dispatcher();
-  const Service = ServiceFactory();
   const system = {
     Services: [],
     Modules: [],
-    ServerModules: [],
     configurations: {},
-    Service,
     App
   };
-  Service.defaultModule = SystemObject(system);
-  setTimeout(() => initializeApp(system), 0);
 
-  App.startService = ({ host, port, route, middlewear }) => {
-    system.Service.startService({
-      route,
-      port,
-      host,
-      middlewear
-    });
-    return App;
-  };
+  setTimeout(() => initializeApp(system), 0);
 
   App.loadService = (name, { host = "localhost", port, route, url, limit, wait }) => {
     url = url || `http://${host}:${port}/${route}`;
@@ -51,14 +37,6 @@ module.exports = function TasksJSApp() {
       name,
       __constructor,
       module: SystemObject(system)
-    });
-    return App;
-  };
-
-  App.ServerModule = (name, __constructor) => {
-    system.ServerModules.push({
-      name,
-      __constructor
     });
     return App;
   };
