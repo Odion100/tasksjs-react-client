@@ -20,17 +20,18 @@ describe("Client", () => {
 
     expect(buAPI)
       .to.be.an("object")
-      .that.has.all.keys("emit", "on", "resetConnection", "orders", "eventTester")
+      .that.has.all.keys("emit", "on", "disconnect", "resetConnection", "orders", "eventTester")
       .that.respondsTo("emit")
       .that.respondsTo("on")
-      .that.respondsTo("resetConnection");
+      .that.respondsTo("resetConnection")
+      .that.respondsTo("disconnect");
 
     expect(buAPI.orders)
       .to.be.an("object")
       .that.has.all.keys(
         "emit",
         "on",
-
+        "disconnect",
         "__setConnection",
         "__connectionData",
         "action1",
@@ -38,6 +39,7 @@ describe("Client", () => {
       )
       .that.respondsTo("emit")
       .that.respondsTo("on")
+      .that.respondsTo("disconnect")
       .that.respondsTo("emit")
       .that.respondsTo("__setConnection")
       .that.respondsTo("__connectionData")
