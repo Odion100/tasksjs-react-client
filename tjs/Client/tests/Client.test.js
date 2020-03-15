@@ -76,4 +76,20 @@ describe("Service", () => {
       setTimeout(() => buAPI.eventTester.sendEvent(), 500);
     });
   });
+  it("should be able to send REST http requests", async () => {
+    const Client = ClientFactory();
+    const route = "rest-tester";
+    const port = "8492";
+    const url = `http://localhost:${port}/${route}`;
+
+    const buAPI = await Client.loadService(url);
+    const getResponse = await buAPI.restTester.get();
+    const putResponse = await buAPI.restTester.put();
+    const postResponse = await buAPI.restTester.post();
+    const deleteResponse = await buAPI.restTester.delete();
+    expect(getResponse).to.deep.equal({ REST_TEST_PASSED: true, getResponse: true });
+    expect(putResponse).to.deep.equal({ REST_TEST_PASSED: true, putResponse: true });
+    expect(postResponse).to.deep.equal({ REST_TEST_PASSED: true, postResponse: true });
+    expect(deleteResponse).to.deep.equal({ REST_TEST_PASSED: true, deleteResponse: true });
+  });
 });
