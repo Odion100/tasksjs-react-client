@@ -7,10 +7,7 @@ const url = `http://localhost:${port}/${route}`;
 describe("Client Factory", () => {
   it("should return a TasksJS Client", () => {
     const Client = ClientFactory();
-    expect(Client)
-      .to.be.an("object")
-      .that.has.property("loadService")
-      .that.is.a("function");
+    expect(Client).to.be.an("object").that.has.property("loadService").that.is.a("function");
   });
 });
 describe("Client", () => {
@@ -66,15 +63,12 @@ describe("Service", () => {
     const Client = ClientFactory();
     const buAPI = await Client.loadService(url);
 
-    await new Promise(resolve => {
-      buAPI.eventTester.on(eventName, data => {
-        console.log("Ladies and gentleman... mission accomplish!");
-        expect(true).to.equal(true);
-        resolve();
-      });
-
-      setTimeout(() => buAPI.eventTester.sendEvent(), 500);
+    buAPI.eventTester.on(eventName, (data) => {
+      console.log("Ladies and gentleman... mission accomplish!");
+      expect(true).to.equal(true);
     });
+
+    buAPI.eventTester.sendEvent();
   });
   it("should be able to send REST http requests", async () => {
     const Client = ClientFactory();
