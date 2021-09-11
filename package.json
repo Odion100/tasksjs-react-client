@@ -30,6 +30,6 @@
   },
   "homepage": "https://github.com/Odion100/tasksjs-react-client#readme",
   "devDependencies": {
-    "chai": "^4.2.0"
+    "chai": "^4.3.0"
   }
 }
