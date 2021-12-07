@@ -34,7 +34,8 @@ describe("Client", () => {
         "action1",
         "action2",
         "multiArgTest",
-        "noArgTest"
+        "noArgTest",
+        "anyArgTest"
       )
       .that.respondsTo("emit")
       .that.respondsTo("on")
@@ -43,7 +44,10 @@ describe("Client", () => {
       .that.respondsTo("__setConnection")
       .that.respondsTo("__connectionData")
       .that.respondsTo("action1")
-      .that.respondsTo("action2");
+      .that.respondsTo("action2")
+      .that.respondsTo("multiArgTest")
+      .that.respondsTo("noArgTest")
+      .that.respondsTo("anyArgTest");
   });
 });
 
@@ -159,5 +163,48 @@ describe("Service", () => {
     expect(putResponse).to.deep.equal({ REST_TEST_PASSED: true, putResponse: true });
     expect(postResponse).to.deep.equal({ REST_TEST_PASSED: true, postResponse: true });
     expect(deleteResponse).to.deep.equal({ REST_TEST_PASSED: true, deleteResponse: true });
+  });
+
+  it("should correctly validate the number of arguments passed to the ServerModule", async () => {
+    const Client = ClientFactory();
+    const buAPI = await Client.loadService(url);
+
+    try {
+      await buAPI.orders.noArgTest(3);
+    } catch (error) {
+      expect(error).to.deep.equal({
+        TasksJSServiceError: true,
+        message:
+          "In valid number of arguments: Expected 1 (including a callback function), Recieved 2 (including a callback function).",
+        serviceUrl: url,
+        status: 400,
+        fn: "noArgTest",
+        module_name: "orders",
+      });
+    }
+
+    try {
+      await buAPI.orders.multiArgTest();
+    } catch (error) {
+      expect(error).to.deep.equal({
+        TasksJSServiceError: true,
+        message:
+          "In valid number of arguments: Expected 4 (including a callback function), Recieved 1 (including a callback function).",
+        serviceUrl: url,
+        status: 400,
+        fn: "multiArgTest",
+        module_name: "orders",
+      });
+    }
+    const arg1 = 1;
+    const arg2 = 2;
+    const results = await buAPI.orders.anyArgTest(arg1, arg2);
+
+    expect(results).to.deep.equal({
+      SERVICE_TEST_PASSED: true,
+      anyArgTest: true,
+      arg1,
+      arg2,
+    });
   });
 });
