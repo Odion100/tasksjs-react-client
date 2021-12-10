@@ -207,4 +207,18 @@ describe("Service", () => {
       arg2,
     });
   });
+  it("should be able to use 'useReturnValue' configuration option to enable synchronouse return values from ServerModule methods", async () => {
+    const route = "sync/test";
+    const port = 4920;
+    const url = `http://localhost:${port}/${route}`;
+
+    const Client = ClientFactory();
+    const { AsyncMath } = await Client.loadService(url);
+    const results = await AsyncMath.max(10, 2);
+    expect(results).to.equal(10);
+    const results2 = await AsyncMath.min(10, 2);
+    expect(results2).to.equal(2);
+    const results3 = await AsyncMath.round(10.2);
+    expect(results3).to.equal(10);
+  });
 });
